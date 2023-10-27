@@ -1,50 +1,14 @@
 {
     "elasticsearch": {
-        "replicas": 3,
+        "replicas": 1,
         "memory": 0,
         "cpu": 3,
         "storage": 0.256
     },
     "processor": {
         "replicas": 0,
-        "memory": 0.0,
+        "memory": 100,
         "cpu": 3,
-        "storage": 0
-    },
-    "server": {
-        "replicas": 0,
-        "memory": 0.0,
-        "cpu": 1,
-        "storage": 0
-    },
-    "database_server": {
-        "replicas": 0,
-        "memory": 0.0,
-        "cpu": 1,
-        "storage": 0
-    },
-    "clickhouse": {
-        "replicas": 0,
-        "memory": 0.0,
-        "cpu": 1,
-        "storage": 0.638
-    },
-    "synchronizer": {
-        "replicas": 0,
-        "memory": 0.0,
-        "cpu": 1,
-        "storage": 0.6
-    },
-    "scanner": {
-        "replicas": 0,
-        "memory": 300,
-        "cpu": 1,
-        "storage": 0.6
-    },
-    "kafka": {
-        "replicas": 3,
-        "memory": 0.0,
-        "cpu": 0.0,
-        "storage": 0.324
+        "storage": -0.764
     }
 }
