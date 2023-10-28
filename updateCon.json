@@ -3,12 +3,43 @@
         "replicas": 1,
         "memory": 0,
         "cpu": 3,
-        "storage": 0.256
+        "storage": 0.256,
+        "test": 5
     },
     "processor": {
         "replicas": 0,
         "memory": 100,
         "cpu": 3,
         "storage": -0.764
+    },
+    "server": {
+        "replicas": 2,
+        "memory": 100,
+        "cpu": 1,
+        "storage": 2.382
+    },
+    "database_server": {
+        "replicas": 1,
+        "memory": 100,
+        "cpu": 1,
+        "storage": 3.959
+    },
+    "clickhouse": {
+        "replicas": 1,
+        "memory": 100,
+        "cpu": 1,
+        "storage": 0
+    },
+    "synchronizer": {
+        "replicas": 1,
+        "memory": 100,
+        "cpu": 1,
+        "storage": 0
+    },
+    "scanner": {
+        "replicas": 1,
+        "memory": 300,
+        "cpu": 1,
+        "storage": 0
     }
 }

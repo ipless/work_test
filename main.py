@@ -29,7 +29,7 @@ class help:
         
     def round_up(float_number:float, number_of_decimals:int):
         """ функция округления в большую сторону до определенного знака """
-        return math.ceil(float_number*pow(10,number_of_decimals))/pow(10,number_of_decimals)
+        return math.ceil(float_number*pow(10, number_of_decimals))/pow(10, number_of_decimals)
     
     def check_none_json(filename: str):
         """проверка на пустой json"""
@@ -43,6 +43,8 @@ class help:
 
     def check_right_input(input_data:str) -> dict:
         """ функция для проверки корректрности входных типов данных"""
+
+        #Строка с примером того, ято обязан содержать json файл
         Rightdic = "\"agents\": int, \n\"storage\": int \n\"traffic\": float, \
         \n\"traffic\": float, \n\"mail_traffic\": float, \n\"distributed\": bool,\
         \n\"nodes\": int "
@@ -55,10 +57,6 @@ class help:
                 #первое условие проверяет наличие всех входных переменных в json файле
                 #второе условие проверяет правильность типов данных
                 #в случае false выведет сообщение о некорректности данных и выйдет из приложения
-                #
-                #подумать по поводу ввода данных, ибо корректировать каждый раз json 
-                #такое себе занятие 
-                #
                 if 'agents' and 'storage' and 'traffic' and 'mail_traffic' and 'distributed' and 'nodes' in buffer:
                     if (isinstance(buffer['agents'], int) and isinstance(buffer['storage'], float) and
                         isinstance(buffer['traffic'], float) and isinstance(buffer['mail_traffic'], float)
@@ -66,92 +64,127 @@ class help:
                         return buffer
                     else:
                         print('incorrect input data, waiting\n'+ Rightdic)
-                        #
-                        #сделать вывод формата /ожидалось получить и пример json
-                        #
                         sys.exit()
-                        raise Exception('incorrect input')
-                        help.check_right_input(input_data)
                 else:
                     print('incorrect input data, waiting\n'+ Rightdic)
                     sys.exit() 
-                    raise Exception('incorrect input')
-                    help.check_right_input(input_data)
+
+class help_with_calc:
+    """Данный класс содержит методы для расчета конфигурации сервисов"""
+    def calc_kafka(agents:int, storage:float, traffic:float, mail_traffic:float, distributed:bool, nodes:int) -> dict:
+        replicas = 3 if distributed else 1
+        memory = mail_traffic*0.5 if distributed else 100
+        cpu = help.round_up((0.000169*agents+0.437923)*nodes/3,2)
+        storage = help.round_up(0.0004*agents+0.3231,3)
+        return {
+                'replicas':replicas,
+                'memory':memory,
+                'cpu':cpu,
+                'storage':storage,
+            }
+    def calc_elasticsearch(agents:int, storage:float, traffic:float, mail_traffic:float, distributed:bool, nodes:int)-> dict:
+        replicas = 3 if distributed else 1
+        memory = 0
+        cpu = 3
+        storage = 0.256 if agents<5000 else 0.512 if agents<10000 else 1
+        return {
+            'replicas':replicas,
+            'memory':memory,
+            'cpu':cpu,
+            'storage':storage,
+            }
+    def calc_processor(agents:int, storage:float, traffic:float, mail_traffic:float, distributed:bool, nodes:int)-> dict:
+        replicas = (3 if distributed==1 else 0) if (agents>0 and storage>0) else 0
+        memory = traffic*0.5 if distributed else 100
+        cpu = 3
+        storage = help.round_up(-4.25877+0.98271*math.log(agents),3) if nodes>0 else 0
+        return {
+            'replicas':replicas,
+            'memory':memory,
+            'cpu':cpu,
+            'storage':storage,
+            }
+    def calc_server(agents:int, storage:float, traffic:float, mail_traffic:float, distributed:bool, nodes:int)-> dict:
+        replicas = min(agents,2) if (agents>0 and storage>0) else 0             
+        memory = help.math_round(traffic*0.5,3) if distributed else 100
+        cpu = 1
+        storage = help.round_up((0.0019*agents+2.3154),3) if nodes>0 else 0
+        return {
+            'replicas':replicas,
+            'memory':memory,
+            'cpu':cpu,
+            'storage':storage,
+            }
+    def calc_database_server(agents:int, storage:float, traffic:float, mail_traffic:float, distributed:bool, nodes:int)-> dict:
+        replicas = (max(help.math_round(agents/15000,1)) if distributed else 1) if agents>0 else 0
+        memory = help.math_round(storage*1.6,3) if distributed else 100
+        cpu = 1
+        storage = help.round_up((0.00000002*agents*agents+0.00067749*agents+4.5)*agents/nodes,3) if nodes>0 else 0
+        return {
+                'replicas':replicas,
+                'memory':memory,
+                'cpu':cpu,
+                'storage':storage,
+            }
+    def calc_clickhouse(agents:int, storage:float, traffic:float, mail_traffic:float, distributed:bool, nodes:int)-> dict:
+        replicas = (max(help.math_round(agents/15000),1) if distributed else 1) if agents>0 else 0 
+        memory = help.math_round(storage*1.6,3) if distributed else 100
+        cpu = 1
+        storage = help.round_up(0.0000628*agents+0.6377,3) if distributed else 0
+        return {
+                'replicas':replicas,
+                'memory':memory,
+                'cpu':cpu,
+                'storage':storage,
+            }
+    def calc_synchronizer(agents:int, storage:float, traffic:float, mail_traffic:float, distributed:bool, nodes:int)-> dict:
+        replicas = 1 if agents>0 else 0
+        memory = help.round_up(storage/5000,3)*1.6 if distributed else 100
+        cpu = 1
+        storage = help.round_up(0.0002*agents+0.6,3) if distributed else 0
+        return {
+                'replicas':replicas,
+                'memory':memory,
+                'cpu':cpu,
+                'storage':storage,
+            }
+    def calc_scanner(agents:int, storage:float, traffic:float, mail_traffic:float, distributed:bool, nodes:int)-> dict:
+        replicas = 1 if agents>0 else 0
+        memory = 300 
+        cpu = 1
+        storage = help.round_up(0.0002*agents+0.6,3) if distributed else 0
+        return {
+                'replicas':replicas,
+                'memory':memory,
+                'cpu':cpu,
+                'storage':storage,
+            }
 class Calculator:
 
-    def __init__(self, config: dict):
+    def __init__(self, config:dict):
         self._config = config
 
     def update_config(self, agents:int, storage:float, traffic:float, mail_traffic:float, distributed:bool, nodes:int) -> dict:
-        """Функция для генерации конфигурации"""
-        buffer = copy.deepcopy(self._config)
-        for x in buffer:
-            #
-            #возможно надо будет поменять if else на case 
-            #прочить условия задачи на используемую версию python
-            #
-            if x == 'kafka':
-                #buffer['kafka'] = buffer['kafka'] if 'kafka' in buffer else {}
-                buffer['kafka']['replicas'] = 3 if distributed else 1
-                buffer['kafka']['memory'] = mail_traffic*0.5 if distributed else 100
-                buffer['kafka']['cpu'] = help.round_up((0.000169*agents+0.437923)*nodes/3,2)
-                buffer['kafka']['storage'] = help.round_up(0.0004*agents+0.3231,3)
-            
-            elif x == 'elasticsearch':
-            #buffer['elasticsearch'] = buffer['elasticsearch'] if 'elasticsearch' in buffer else {}
-                buffer['elasticsearch']['replicas'] = 3 if distributed else 1
-                buffer['elasticsearch']['memory'] = 0
-                buffer['elasticsearch']['cpu'] = 3
-                buffer['elasticsearch']['storage'] = 0.256 if agents<5000 else 0.512 if agents<10000 else 1
-            
-            elif x == 'processor':    
-            #buffer['processor'] = buffer['processor'] if 'processor' in buffer else {}
-                buffer['processor']['replicas'] = (3 if distributed==1 else 0) if (agents>0 and storage>0) else 0
-                buffer['processor']['memory'] = traffic*0.5 if distributed else 100
-                buffer['processor']['cpu'] = 3
-                buffer['processor']['storage'] = help.round_up(-4.25877+0.98271*math.log(agents),3) if nodes>0 else 0
-            
-            elif x == 'server':
-            #buffer['server'] = buffer['server'] if 'server' in buffer else {}
-                buffer['server']['replicas'] = min(agents,2) if (agents>0 and storage>0) else 0             
-                buffer['server']['memory'] = help.math_round(traffic*0.5,3) if distributed else 100
-                buffer['server']['cpu'] = 1
-                buffer['server']['storage'] = help.round_up((0.0019*agents+2,3154),3) if nodes>0 else 0
-
-            elif x == 'database_server':    
-            #buffer['database_server'] = buffer['database_server'] if 'database_server' in buffer else {}
-                buffer['database_server']['replicas'] = (max(help.math_round(agents/15000,1)) if distributed else 1) if agents>0 else 0
-                buffer['database_server']['memory'] = help.math_round(storage*1.6,3) if distributed else 100
-                buffer['database_server']['cpu'] = 1
-                buffer['database_server']['storage'] = help.round_up((0.00000002*agents*agents+0.00067749*agents+4.5)*agents/nodes,3) if nodes>0 else 0
-
-            elif x == 'clickhouse':    
-            #buffer['clickhouse'] = buffer['clickhouse'] if 'clickhouse' in buffer else {}
-                buffer['clickhouse']['replicas'] = (max(help.math_round(agents/15000),1) if distributed else 1) if agents>0 else 0 
-                buffer['clickhouse']['memory'] = help.math_round(storage*1.6,3) if distributed else 100
-                buffer['clickhouse']['cpu'] = 1
-                buffer['clickhouse']['storage'] = help.round_up(0.0000628*agents+0.6377,3) if distributed else 0
-
-            elif x == 'synchronizer':    
-            #buffer['synchronizer'] = buffer['synchronizer'] if 'synchronizer' in buffer else {}
-                buffer['synchronizer']['replicas'] = 1 if agents>0 else 0
-                buffer['synchronizer']['memory'] = help.round_up(storage/5000,3)*1.6 if distributed else 100
-                buffer['synchronizer']['cpu'] = 1
-                buffer['synchronizer']['storage'] = help.round_up(0.0002*agents+0.6,3) if distributed else 0
-
-            elif x == 'scanner':   
-            #buffer['scanner'] = buffer['scanner'] if 'scanner' in buffer else {}
-                buffer['scanner']['replicas'] = 1 if agents>0 else 0
-                buffer['scanner']['memory'] = 300 
-                buffer['scanner']['cpu'] = 1
-                buffer['scanner']['storage'] = help.round_up(0.0002*agents+0.6,3) if distributed else 0
-            
-        return buffer
-
+        """Метод для генерации конфигурации"""
+        dict_func = {   #словарь методов расчета конфигурации
+            'kafka':help_with_calc.calc_kafka,
+            'elasticsearch':help_with_calc.calc_elasticsearch,
+            'processor':help_with_calc.calc_processor,
+            'server':help_with_calc.calc_server,
+            'database_server':help_with_calc.calc_database_server,
+            'clickhouse':help_with_calc.calc_clickhouse,
+            'synchronizer':help_with_calc.calc_synchronizer,
+            'scanner':help_with_calc.calc_scanner
+        }
+        for service in self._config:
+            for param in dict_func[service](agents, storage, traffic, mail_traffic, distributed, nodes):
+                self._config[service][param]=dict_func[service](agents, storage, traffic, mail_traffic, distributed, nodes)[param]
+        return  self._config
+ 
 if __name__ == '__main__':
     
     config = None
-    config=help.check_none_json('testServices.json')
+    config=help.check_none_json('updateCon.json')
 
     calculator = Calculator(config)
     inputData = help.check_right_input('inputData.json')

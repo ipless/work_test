@@ -1,8 +1,8 @@
 {
-    "elasticsearch": {
+    "kafka": {
         
     },
-    "processor": {
-    
+    "elasticsearch":{
+        
     }
 }
