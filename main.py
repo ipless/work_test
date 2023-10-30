@@ -7,7 +7,7 @@ import sys
 #Основные условия работы приложения:
 #1. Все файлы должны лежать в дириктории с приложением
 #2. название файла с передаваемыми параметрами "input_data.json"
-#3. название файла с входной конфигурацией "servicesConf.json"
+#3. название файла с входной конфигурацией "services.json"
 #4. реализовано на версии python 3.10+
 #
 
@@ -15,16 +15,17 @@ import sys
 #так как в тз не сказано, что делать в случае, если на вход подается не полная конфигурация или пустой json файл,
 #то программа будет генерировать конфигурация для всех сервисов, которые были приведены в задании 
 #входные данные будут передаваться через json, так как часто в этом формате собираются разные метрики с ПК
-#само приложение будет консольным, так как от пользователя не требуется вводить что-либо в приложение
+#само приложение будет консольным
 #
-#git
+
 
 class help:
     def math_round(float_number:float, number_of_decimals:int):
         """Математическое округление"""
         #написал собственный метод, ибо round() в python периодически выводит не правильное округление
         bufferNum = float_number*pow(10,number_of_decimals+1)
-        return math.ceil(bufferNum/10)/pow(10,number_of_decimals) if bufferNum%10>=5 else math.floor(bufferNum/10)/pow(10,number_of_decimals)
+        return math.ceil(bufferNum/10)/pow(10,number_of_decimals) if \
+            bufferNum%10>=5 else math.floor(bufferNum/10)/pow(10,number_of_decimals)
 
         
     def round_up(float_number:float, number_of_decimals:int):
@@ -44,7 +45,7 @@ class help:
     def check_right_input(input_data:str) -> dict:
         """ функция для проверки корректрности входных типов данных"""
 
-        #Строка с примером того, ято обязан содержать json файл
+        #Строка с примером того, что обязан содержать json файл
         Rightdic = "\"agents\": int, \n\"storage\": int \n\"traffic\": float, \
         \n\"traffic\": float, \n\"mail_traffic\": float, \n\"distributed\": bool,\
         \n\"nodes\": int "
@@ -116,7 +117,7 @@ class help_with_calc:
             'storage':storage,
             }
     def calc_database_server(agents:int, storage:float, traffic:float, mail_traffic:float, distributed:bool, nodes:int)-> dict:
-        replicas = (max(help.math_round(agents/15000,1)) if distributed else 1) if agents>0 else 0
+        replicas = (max(help.math_round(agents/15000,0),1) if distributed else 1) if agents>0 else 0
         memory = help.math_round(storage*1.6,3) if distributed else 100
         cpu = 1
         storage = help.round_up((0.00000002*agents*agents+0.00067749*agents+4.5)*agents/nodes,3) if nodes>0 else 0
@@ -127,7 +128,7 @@ class help_with_calc:
                 'storage':storage,
             }
     def calc_clickhouse(agents:int, storage:float, traffic:float, mail_traffic:float, distributed:bool, nodes:int)-> dict:
-        replicas = (max(help.math_round(agents/15000),1) if distributed else 1) if agents>0 else 0 
+        replicas = (max(help.math_round(agents/15000,0),1) if distributed else 1) if agents>0 else 0 
         memory = help.math_round(storage*1.6,3) if distributed else 100
         cpu = 1
         storage = help.round_up(0.0000628*agents+0.6377,3) if distributed else 0
@@ -181,13 +182,14 @@ class Calculator:
                 self._config[service][param]=dict_func[service](agents, storage, traffic, mail_traffic, distributed, nodes)[param]
         return  self._config
  
+
 if __name__ == '__main__':
     
     config = None
-    config=help.check_none_json('updateCon.json')
+    config=help.check_none_json('services.json')
 
     calculator = Calculator(config)
-    inputData = help.check_right_input('inputData.json')
+    inputData = help.check_right_input('input_data.json')
     
     updated_config = calculator.update_config(inputData['agents'], inputData['storage'], inputData['traffic'], 
                                               inputData['mail_traffic'], inputData['distributed'], inputData['nodes'])

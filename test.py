@@ -1,29 +1,7 @@
+from main import help
 
-import json
-from main import Calculator
-import testDir
+print(help.math_round(12.123,2))
 
+print(type(ZeroDivisionError))
 
-
-def kafka(a,b):
-    return a+b
-def serp(a,b):
-    return a/b
-def qwe(a,b):
-    return a*b
-def asd(a,b):
-    return a-b
-a=10
-b=2
-dicfunc={
-    'kafka':kafka,
-    'serp':serp,
-    'qwe':qwe,
-    'asd':asd
-}
-config = None
-with open('testServices.json') as f:
-     config=json.load(f)
-
-for service in config:
-    print(dicfunc[service](a,b))
+print(len((str(123.34).split(".")[1])))
