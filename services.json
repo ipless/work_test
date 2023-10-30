@@ -1,51 +1,51 @@
 {
-    "kafka":{
-        "replicas": 0,
-        "memory": 0,
-        "cpu": 0,
-        "storage": 0,
-        "test":0
+    "kafka": {
+        "replicas": 1,
+        "memory": 100,
+        "cpu": 5.63,
+        "storage": 0.338,
+        "test": 0
     },
     "elasticsearch": {
-        "replicas": 0,
+        "replicas": 1,
         "memory": 0,
-        "cpu": 0,
-        "storage": 0
+        "cpu": 3,
+        "storage": 0.256
     },
     "processor": {
         "replicas": 0,
-        "memory": 0,
-        "cpu": 0,
-        "storage": 0
+        "memory": 100,
+        "cpu": 3,
+        "storage": -0.737
     },
     "server": {
-        "replicas": 0,
-        "memory": 0,
-        "cpu": 0,
-        "storage": 0
+        "replicas": 2,
+        "memory": 100,
+        "cpu": 1,
+        "storage": 2.384
     },
     "database_server": {
-        "replicas": 0,
-        "memory": 0,
-        "cpu": 0,
-        "storage": 0
+        "replicas": 1,
+        "memory": 100,
+        "cpu": 1,
+        "storage": 4.287
     },
     "clickhouse": {
-        "replicas": 0,
-        "memory": 0,
-        "cpu": 0,
+        "replicas": 1,
+        "memory": 100,
+        "cpu": 1,
         "storage": 0
     },
     "synchronizer": {
-        "replicas": 0,
-        "memory": 0,
-        "cpu": 0,
+        "replicas": 1,
+        "memory": 100,
+        "cpu": 1,
         "storage": 0
     },
     "scanner": {
-        "replicas": 0,
-        "memory": 0,
-        "cpu": 0,
+        "replicas": 1,
+        "memory": 300,
+        "cpu": 1,
         "storage": 0
-    }   
+    }
 }

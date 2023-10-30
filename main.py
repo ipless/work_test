@@ -194,5 +194,5 @@ if __name__ == '__main__':
     updated_config = calculator.update_config(inputData['agents'], inputData['storage'], inputData['traffic'], 
                                               inputData['mail_traffic'], inputData['distributed'], inputData['nodes'])
     
-    with open('updateCon.json', 'w') as f:
+    with open('services.json', 'w') as f:
         json.dump(updated_config, f)
